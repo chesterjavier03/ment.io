@@ -76,6 +76,10 @@ angular.module('mentio-demo', ['mentio', 'ngRoute', 'ui.tinymce'])
             });
         };
 
+        $scope.searchPeopleDelayed = function(term) {
+            $timeout(function () {$scope.searchPeople(term)}, 200);
+        };
+
         $scope.searchSimplePeople = function(term) {
             return $http.get('simplepeopledata.json').then(function (response) {
                 $scope.simplePeople = [];

@@ -29,6 +29,8 @@ angular.module('mentio', [])
 
                     remoteScope.showMenu();
 
+                    remoteScope.showMessageSearching();
+
                     remoteScope.search({
                         term: triggerText
                     });
@@ -463,7 +465,9 @@ angular.module('mentio', [])
                 items: '=mentioItems',
                 triggerChar: '=mentioTriggerChar',
                 forElem: '=mentioFor',
-                parentScope: '=mentioParentScope'
+                parentScope: '=mentioParentScope',
+                messageSearching: '@mentioMessageSearching',
+                messageNothingFound: '@mentioMessageNothingFound'
             },
             templateUrl: function(tElement, tAttrs) {
                 return tAttrs.mentioTemplateUrl !== undefined ? tAttrs.mentioTemplateUrl : 'mentio-menu.tpl.html';
@@ -530,6 +534,20 @@ angular.module('mentio', [])
                     }
                 };
 
+                $scope.showMessageSearching = function () {
+                    $scope.visible = true;
+                    $scope.requestVisiblePendingSearch = true;
+                    $scope.message = $scope.messageSearching;
+                };
+
+                $scope.showMessageNothingFound = function () {
+                    $scope.message = $scope.messageNothingFound;
+                };
+
+                $scope.hideMessage = function () {
+                    $scope.message = undefined;
+                };
+
                 $scope.setParent = function (scope) {
                     $scope.parentMentio = scope;
                     $scope.targetElement = scope.targetElement;
@@ -575,12 +593,18 @@ angular.module('mentio', [])
                 scope.$watch('items', function (items) {
                     if (items && items.length > 0) {
                         scope.activate(items[0]);
-                        if (!scope.visible && scope.requestVisiblePendingSearch) {
-                            scope.visible = true;
+                        scope.visible = true;
+                        scope.hideMessage();
+                        if (scope.requestVisiblePendingSearch) {
                             scope.requestVisiblePendingSearch = false;
                         }
                     } else {
-                        scope.hideMenu();
+                        if (scope.messageNothingFound) {
+                            scope.showMessageNothingFound();
+                            scope.visible = true;
+                        } else {
+                            scope.hideMenu();
+                        }
                     }
                 });
 
@@ -1239,4 +1263,4 @@ angular.module('mentio')
         };
     }]);
 
-angular.module("mentio").run(["$templateCache", function($templateCache) {$templateCache.put("mentio-menu.tpl.html","<style>\n.scrollable-menu {\n    height: auto;\n    max-height: 300px;\n    overflow: auto;\n}\n\n.menu-highlighted {\n    font-weight: bold;\n}\n</style>\n<ul class=\"dropdown-menu scrollable-menu\" style=\"display:block\">\n    <li mentio-menu-item=\"item\" ng-repeat=\"item in items track by $index\">\n        <a class=\"text-primary\" ng-bind-html=\"item.label | mentioHighlight:typedTerm:\'menu-highlighted\' | unsafe\"></a>\n    </li>\n</ul>");}]);
+angular.module("mentio").run(["$templateCache", function($templateCache) {$templateCache.put("mentio-menu.tpl.html","<style>\n.scrollable-menu {\n    height: auto;\n    max-height: 300px;\n    overflow: auto;\n}\n\n.menu-highlighted {\n    font-weight: bold;\n}\n.mentio-message {\n	pointer-events: none !important;\n}\n.mentio-message-text {\n	color: #888;\n	font-style: italic;\n}\n</style>\n<ul class=\"dropdown-menu scrollable-menu\" style=\"display:block\">\n	<li ng-if=\"message\" class=\"mentio-message\">\n		<span class=\"mentio-message-text\" ng-bind=\"message\"></span>\n	</li>\n    <li mentio-menu-item=\"item\" ng-repeat=\"item in items track by $index\">\n        <a class=\"text-primary\" ng-bind-html=\"item.label | mentioHighlight:typedTerm:\'menu-highlighted\' | unsafe\"></a>\n    </li>\n</ul>");}]);

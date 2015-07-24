@@ -95,6 +95,33 @@
                                 mentio-select="getProductTextRaw(item)"></mentio-menu>
 
                     <div class="form-group">
+                        <h3>Content Editable with custom messages (trigger character '*':</h3>
+                        <div contenteditable mentio
+                            mentio-typed-term="typedTerm3"
+                            mentio-macros="macros"
+                            mentio-require-leading-space="true"
+                            mentio-select-not-found="true"
+                            class="editor form-control"
+                            mentio-id="'customMessages'"
+                            id="customMessages"
+                            ng-model="customMessages"
+                            >
+                        </div>
+                        <span class="caption small">Mentioned: {{typedTerm3}}</span>
+                    </div>
+
+                    <mentio-menu
+                                mentio-for="'customMessages'"
+                                mentio-trigger-char="'*'"
+                                mentio-items="people"
+                                mentio-template-url="/people-mentions-messages.tpl"
+                                mentio-search="searchPeopleDelayed(term)"
+                                mentio-select="getPeopleText(item)"
+                                mentio-message-searching="Searching..."
+                                mentio-message-nothing-found="Couldn't find any suggestions"
+                                ></mentio-menu>
+
+                    <div class="form-group">
                         <h3>Text Input:</h3>
                         <!--Note the use of an angular expression for the ID.  This can be done within ng-repeat using $index-->
                         <input mentio
@@ -166,6 +193,19 @@
     <script type="text/ng-template" id="/people-mentions.tpl">
         <ul class="list-group user-search">
             <li mentio-menu-item="person" ng-repeat="person in items" class="list-group-item">
+                <img ng-src="{{person.imageUrl}}" class="user-photo">
+                <span class="text-primary" ng-bind-html="person.name | mentioHighlight:typedTerm:'menu-highlighted' | unsafe"></span>
+                <em class="text-muted" ng-bind="person.bio | words:5"></em>
+            </li>
+        </ul>
+    </script>
+
+    <script type="text/ng-template" id="/people-mentions-messages.tpl">
+        <ul class="list-group user-search">
+            <li class="list-group-item mentio-message" ng-if="message">
+                <span class="mentio-message-text" ng-bind="message"></span>
+            </li>
+            <li mentio-menu-item="person" ng-repeat="person in items" class="list-group-item" ng-if="!requestVisiblePendingSearch">
                 <img ng-src="{{person.imageUrl}}" class="user-photo">
                 <span class="text-primary" ng-bind-html="person.name | mentioHighlight:typedTerm:'menu-highlighted' | unsafe"></span>
                 <em class="text-muted" ng-bind="person.bio | words:5"></em>

@@ -8,8 +8,18 @@
 .menu-highlighted {
     font-weight: bold;
 }
+.mentio-message {
+	pointer-events: none !important;
+}
+.mentio-message-text {
+	color: #888;
+	font-style: italic;
+}
 </style>
 <ul class="dropdown-menu scrollable-menu" style="display:block">
+	<li ng-if="message" class="mentio-message">
+		<span class="mentio-message-text" ng-bind="message"></span>
+	</li>
     <li mentio-menu-item="item" ng-repeat="item in items track by $index">
         <a class="text-primary" ng-bind-html="item.label | mentioHighlight:typedTerm:'menu-highlighted' | unsafe"></a>
     </li>
